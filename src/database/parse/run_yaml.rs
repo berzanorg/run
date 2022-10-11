@@ -26,6 +26,7 @@ impl<'a> Database<'a> {
                                 value.trim(),
                                 last_comment.unwrap_or("No information specified."),
                             );
+                            last_comment = None;
 
                             match db.add(name, script) {
                                 Ok(()) => (),
