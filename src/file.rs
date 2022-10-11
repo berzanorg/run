@@ -14,6 +14,18 @@ pub enum FileError {
     Exists(FileName),
 }
 
+// Implement `ToString` trait for `FileError`.
+impl ToString for FileError {
+    fn to_string(&self) -> String {
+        match self {
+            Self::CannotBeRead(file_name) => format!("can't read {}", file_name),
+            Self::CannotBeWritten(file_name) => format!("can't write to {}", file_name),
+            Self::Exists(file_name) => format!("{} already exists", file_name),
+            Self::NotFound(file_name) => format!("{} is not found", file_name),
+        }
+    }
+}
+
 /// The type based on `Result<T, FileError>`.
 type Result<T> = core::result::Result<T, FileError>;
 
@@ -45,21 +57,15 @@ pub fn write(file_name: FileName, content: &str) -> Result<()> {
 /// Only writes, if the file doesn't exists.
 ///
 pub fn create(file_name: FileName, content: &str) -> Result<()> {
-    if std::path::Path::new(file_name).exists() {
+    if exists(file_name) {
         return Err(FileError::Exists(file_name));
     } else {
         write(file_name, content)
     }
 }
 
-// Implement `ToString` trait for `FileError`.
-impl ToString for FileError {
-    fn to_string(&self) -> String {
-        match self {
-            Self::CannotBeRead(file_name) => format!("can't read {}", file_name),
-            Self::CannotBeWritten(file_name) => format!("can't write to {}", file_name),
-            Self::Exists(file_name) => format!("{} already exists", file_name),
-            Self::NotFound(file_name) => format!("{} is not found", file_name),
-        }
-    }
+/// Returns `true` if the given file exists in the current directory.
+/// Otherwise returns `false`.
+pub fn exists(file_name: FileName) -> bool {
+    std::path::Path::new(file_name).exists()
 }
