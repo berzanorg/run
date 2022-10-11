@@ -3,9 +3,9 @@ use std::process::Command;
 /// A script has a command and an info.
 pub struct Script {
     /// The command of the script.
-    command: String,
+    pub command: String,
     /// The info about the script.
-    info: String,
+    pub info: String,
 }
 
 impl Script {
