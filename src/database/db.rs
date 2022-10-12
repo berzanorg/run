@@ -54,7 +54,7 @@ impl<'a> Database<'a> {
 
         for (name, script) in &self.script_map {
             extraction = format!(
-                "{}# {}\n{}: {}\n",
+                "{}# {}\n{}: {}\n\n",
                 extraction,
                 script.comment(),
                 name,
@@ -84,7 +84,7 @@ impl<'a> Database<'a> {
             // We don't need to be warned, cuz the result won't affect any operation.
             #[allow(unused_must_use)]
             {
-                file::create("run.yaml", &extraction);
+                file::write("run.yaml", &extraction);
             }
         };
     }
