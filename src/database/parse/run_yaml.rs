@@ -51,12 +51,9 @@ impl<'a> Database<'a> {
             }
         }
 
-        if db.extract().ne(run_yaml) {
-            #[allow(unused_must_use)]
-            {
-                db.save();
-            }
-        }
+        db.save_if_bad(run_yaml);
+
+        println!("{}", db.extract());
 
         Ok(db)
     }
