@@ -49,7 +49,7 @@ impl<'a> Database<'a> {
     }
 
     /// Extracts the entire database into a `String`, to be saved later.
-    fn extract(&self) -> String {
+    pub(super) fn extract(&self) -> String {
         let mut extraction = String::new();
 
         for (name, script) in &self.script_map {
