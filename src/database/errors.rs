@@ -26,48 +26,69 @@ pub enum FormatError {
     UsedName,
 }
 
+impl FormatError {
+    pub fn into_parse_error(self, line_no: usize, file_name: FileName) -> ParseError {
+        match self {
+            Self::MinusInStartOfName => ParseError::MinusInStartOfName(line_no, file_name),
+            Self::NoCommand => ParseError::NoCommand(line_no, file_name),
+            Self::NoName => ParseError::NoName(line_no, file_name),
+            Self::SpaceInName => ParseError::SpaceInName(line_no, file_name),
+            Self::UsedName => ParseError::UsedName(line_no, file_name),
+        }
+    }
+}
+
 /// The type representing a line number.
 pub type LineNumber = usize;
 
+/// The type representing a line number.
+pub type FileName = &'static str;
+
 /// The error type for parsing operations.
 pub enum ParseError {
-    NoName(LineNumber),
-    NoCommand(LineNumber),
-    SpaceInName(LineNumber),
-    MinusInStartOfName(LineNumber),
-    NoColon(LineNumber),
-    UnexpectedComment(LineNumber),
-    UsedName(LineNumber),
-}
-
-impl ParseError {
-    pub fn from_parse_error(err: FormatError, line_no: usize) -> ParseError {
-        match err {
-            FormatError::MinusInStartOfName => ParseError::MinusInStartOfName(line_no),
-            FormatError::NoCommand => ParseError::NoCommand(line_no),
-            FormatError::NoName => ParseError::NoName(line_no),
-            FormatError::SpaceInName => ParseError::SpaceInName(line_no),
-            FormatError::UsedName => ParseError::UsedName(line_no),
-        }
-    }
+    NoName(LineNumber, FileName),
+    NoCommand(LineNumber, FileName),
+    SpaceInName(LineNumber, FileName),
+    MinusInStartOfName(LineNumber, FileName),
+    NoColon(LineNumber, FileName),
+    UnexpectedComment(LineNumber, FileName),
+    UsedName(LineNumber, FileName),
 }
 
 impl ToString for ParseError {
     fn to_string(&self) -> String {
         match self {
-            Self::MinusInStartOfName(line_no) => {
-                format!("LINE {}: a name cannot start with a minus symbol", line_no)
+            Self::MinusInStartOfName(line_no, file_name) => {
+                format!(
+                    "LINE {}: a name cannot start with a minus symbol in {}",
+                    line_no, file_name
+                )
             }
-            Self::NoColon(line_no) => {
-                format!("LINE {}: seperate name and script with a colon", line_no)
+            Self::NoColon(line_no, file_name) => {
+                format!(
+                    "LINE {}: seperate name and script with a colon in {}",
+                    line_no, file_name
+                )
             }
-            Self::NoCommand(line_no) => format!("LINE {}: script is empty", line_no),
-            Self::NoName(line_no) => format!("LINE {}: name is empty", line_no),
-            Self::SpaceInName(line_no) => {
-                format!("LINE {}: a name cannot contain a space symbol", line_no)
+            Self::NoCommand(line_no, file_name) => {
+                format!("LINE {}: script is empty in {}", line_no, file_name)
             }
-            Self::UnexpectedComment(line_no) => format!("LINE {}: unexpected comment", line_no),
-            Self::UsedName(line_no) => format!("LINE {}: same name is used before", line_no),
+            Self::NoName(line_no, file_name) => {
+                format!("LINE {}: name is empty in {}", line_no, file_name)
+            }
+            Self::SpaceInName(line_no, file_name) => {
+                format!(
+                    "LINE {}: a name cannot contain a space symbol in {}",
+                    line_no, file_name
+                )
+            }
+            Self::UnexpectedComment(line_no, file_name) => {
+                format!("LINE {}: unexpected comment in {}", line_no, file_name)
+            }
+            Self::UsedName(line_no, file_name) => format!(
+                "LINE {}: same name is used before in {}",
+                line_no, file_name
+            ),
         }
     }
 }
