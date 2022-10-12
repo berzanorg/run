@@ -76,6 +76,19 @@ impl<'a> Database<'a> {
         file::create("run.yaml", &self.extract())
     }
 
+    /// Saves the database to run.yaml file in the current directory.
+    pub fn save_if_bad(&self, run_yaml: &'a str) {
+        let extraction = self.extract();
+
+        if extraction != run_yaml {
+            // We don't need to be warned, cuz the result won't affect any operation.
+            #[allow(unused_must_use)]
+            {
+                file::create("run.yaml", &extraction);
+            }
+        };
+    }
+
     /// Executes the associated script, and then returns it's exit code.
     pub fn run(&self, alias_or_name: &'a str) -> Result<i32, DatabaseError> {
         let (name, script) = self.get(alias_or_name)?;
