@@ -7,37 +7,50 @@ const RUN_YAML: &'static str = "run.yaml";
 
 impl<'a> Database<'a> {
     pub fn from_run_yaml(run_yaml: &'a str) -> Result<Database<'a>, ParseError> {
+        // Create a new database.
         let mut db = Database::new();
+
+        // Define a variable to hold the last comment inside run.yaml.
         let mut last_comment: Option<&'a str> = None;
 
+        // Get each line and line index.
         for (line_index, line) in run_yaml.lines().enumerate() {
+            // Remove leading and trailing whitespaces.
             let line = line.trim();
 
+            // Only continue if line is not empty.
             if !line.is_empty() {
+                // If a line start with sharp symbol, that means it is a comment.
                 if line.starts_with("#") {
+                    // Set `last_comment` if there isn't `Some(comment)` inside.
                     if last_comment.is_none() {
                         last_comment = Some(&line[1..].trim());
-                    } else {
+                    }
+                    // There is an unexpected comment.
+                    else {
                         return Err(ParseError::UnexpectedComment(line_index + 1, RUN_YAML));
                     }
-                } else {
+                }
+                // If a line isn't a comment, it must hold a script name and script command.
+                else {
+                    // Try to split the line.
                     match line.split_once(": ") {
+                        // If the splition is succesfull, continue.
                         Some((key, value)) => {
+                            // Remove leading and trailing whitespaces.
                             let name = key.trim();
-                            let script = Script::new_with_comment(
-                                value.trim(),
-                                last_comment
-                                    .and_then(|comment| {
-                                        Some(if comment.is_empty() {
-                                            "No comment specified."
-                                        } else {
-                                            comment
-                                        })
-                                    })
-                                    .unwrap_or("No comment specified."),
-                            );
+                            let command = value.trim();
+
+                            // Create a new `Script`.
+                            let script = match last_comment {
+                                Some(comment) => Script::new_with_comment(command, comment),
+                                None => Script::new(command),
+                            };
+
+                            // It has been used, so set it to `None`.
                             last_comment = None;
 
+                            // Try to add name and script into database.
                             match db.add(name, script) {
                                 Ok(()) => (),
                                 Err(err) => {
@@ -45,12 +58,14 @@ impl<'a> Database<'a> {
                                 }
                             }
                         }
+                        // If the splition is failed, return an error.
                         None => return Err(ParseError::NoColon(line_index + 1, RUN_YAML)),
                     }
                 }
             }
         }
 
+        // If current run.yaml content is bad, format it and save.
         db.save_if_bad(run_yaml);
 
         println!("{}", db.extract());
