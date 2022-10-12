@@ -84,8 +84,9 @@ impl<'a> Database<'a> {
 }
 
 #[test]
-fn r() {
-    let package_json = r#"{
+fn test() {
+    // Create a test content.
+    let deno_json = r#"{
         "tasks": {
           "start": "deno run -A --watch=static/,routes/ dev.ts"
         },
@@ -96,10 +97,26 @@ fn r() {
         }
       }"#;
 
-    let db = Database::from_package_json(package_json).ok();
+    // Generate a database from deno.json content.
+    let db = Database::from_deno_json(deno_json).ok().unwrap();
 
-    let mut expected_db = Database::new();
+    // Get all the scripts and names from the database.
+    let scripts_and_names = db.scripts_and_names();
 
-    expected_db.add("compile", Script::new("tsc"));
-    expected_db.add("bundle", Script::new("rollup -c"));
+    // There must be 1 script.
+    assert_eq!(scripts_and_names.len(), 1);
+
+    // Get first script.
+    let (start_name, start_script) = scripts_and_names.get(0).unwrap();
+
+    // Check names.
+    assert_eq!(start_name, &&"start");
+
+    // Check commands.
+    assert_eq!(
+        start_script.command(),
+        "deno run -A --watch=static/,routes/ dev.ts"
+    );
+
+    // As deno.json scripts doesn't have comments, we don't have to check them.
 }
