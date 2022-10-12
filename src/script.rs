@@ -30,7 +30,11 @@ impl<'a> Script<'a> {
     /// let script_greet = Script::new("echo hey!", "Prints a greeting message.");
     /// ```
     pub fn new_with_comment(command: &'a str, comment: &'a str) -> Script<'a> {
-        Script { command, comment }
+        if comment.is_empty() {
+            Script::new(command)
+        } else {
+            Script { command, comment }
+        }
     }
 
     /// Returns `self.command`.
