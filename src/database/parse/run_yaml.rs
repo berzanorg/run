@@ -11,9 +11,9 @@ impl<'a> Database<'a> {
         let mut last_comment: Option<&'a str> = None;
 
         for (line_index, line) in run_yaml.lines().enumerate() {
-            if !line.is_empty() {
-                let line = line.trim();
+            let line = line.trim();
 
+            if !line.is_empty() {
                 if line.starts_with("#") {
                     if last_comment.is_none() {
                         last_comment = Some(&line[1..].trim());
@@ -53,4 +53,44 @@ impl<'a> Database<'a> {
 
         Ok(db)
     }
+}
+
+#[test]
+fn test() {
+    // Create a test content.
+    let run_yaml = r#"
+        # Prints a greeting message.
+        greet: echo hey!
+
+        # Compiles the project.
+        compile: tsc
+
+        "#;
+
+    // Generate a database from run.yaml content.
+    let db = Database::from_run_yaml(run_yaml).ok().unwrap();
+
+    // Get all the scripts and names from the database.
+    let scripts_and_names = db.scripts_and_names();
+
+    // There must be 2 scripts.
+    assert_eq!(scripts_and_names.len(), 2);
+
+    // Get first script.
+    let (compile_name, compile_script) = scripts_and_names.get(0).unwrap();
+
+    // Get second script.
+    let (greet_name, greet_script) = scripts_and_names.get(1).unwrap();
+
+    // Check names.
+    assert_eq!(compile_name, &&"compile");
+    assert_eq!(greet_name, &&"greet");
+
+    // Check commands.
+    assert_eq!(compile_script.command(), "tsc");
+    assert_eq!(greet_script.command(), "echo hey!");
+
+    // Check comments.
+    assert_eq!(compile_script.comment(), "Compiles the project.");
+    assert_eq!(greet_script.comment(), "Prints a greeting message.");
 }
