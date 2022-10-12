@@ -8,7 +8,7 @@ use crate::{
     script::Script,
 };
 
-use super::errors::{DatabaseError, FormatError, ParseError};
+use super::errors::{DatabaseError, FormatError};
 
 /// The type representing a B-Tree map for scripts.
 pub type ScriptMap<'a> = BTreeMap<&'a str, Script<'a>>;
@@ -63,6 +63,12 @@ impl<'a> Database<'a> {
         }
 
         extraction
+    }
+
+    #[cfg(test)]
+    /// Returns a vector of tuples containing scripts and their names.
+    pub(super) fn scripts_and_names(&self) -> Vec<(&&'a str, &'a Script)> {
+        self.script_map.iter().collect()
     }
 
     /// Saves the database to run.yaml file in the current directory.
