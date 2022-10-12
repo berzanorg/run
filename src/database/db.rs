@@ -1,8 +1,14 @@
-use std::collections::{BTreeMap, HashMap};
+use std::{
+    collections::{BTreeMap, HashMap},
+    time::Instant,
+};
 
-use crate::script::Script;
+use crate::{
+    file::{self, FileError},
+    script::Script,
+};
 
-use super::errors::{FormatError, ParseError};
+use super::errors::{DatabaseError, FormatError, ParseError};
 
 /// The type representing a B-Tree map for scripts.
 pub type ScriptMap<'a> = BTreeMap<&'a str, Script<'a>>;
@@ -10,7 +16,7 @@ pub type ScriptMap<'a> = BTreeMap<&'a str, Script<'a>>;
 /// The type for an alias name.
 pub enum AliasName<'a> {
     Name(&'a str),
-    None,
+    Multi,
 }
 
 /// The type representing a hash map for aliasses.
@@ -31,14 +37,102 @@ impl<'a> Database<'a> {
         }
     }
 
-    /// sda.
+    /// Prints all the available scripts' names and comments.
+    pub fn print(&self) {
+        let mut content = "Scripts:\n".to_string();
+
+        for (name, script) in &self.script_map {
+            content = content + "    " + name + "   " + script.comment() + "\n\n";
+        }
+
+        println!("{}", content);
+    }
+
+    /// Extracts the entire database into a `String`, to be saved later.
+    fn extract(&self) -> String {
+        let mut extraction = String::new();
+
+        for (name, script) in &self.script_map {
+            extraction = format!(
+                "{}# {}\n{}: {}\n",
+                extraction,
+                script.comment(),
+                name,
+                script.command()
+            );
+        }
+
+        extraction
+    }
+
+    /// Saves the database to run.yaml file in the current directory.
+    pub fn save(&self) -> Result<(), FileError> {
+        file::create("run.yaml", &self.extract())
+    }
+
+    /// Executes the associated script, and then returns it's exit code.
+    pub fn run(&self, alias_or_name: &'a str) -> Result<i32, DatabaseError> {
+        let (name, script) = self.get(alias_or_name)?;
+
+        println!("run {}", name);
+
+        let start_time = Instant::now();
+
+        let exit_code = if file::exists("package.json") {
+            script.execute(Some("node_modules/.bin"))
+        } else {
+            script.execute(None)
+        };
+
+        let end_time = start_time.elapsed();
+
+        match exit_code {
+            0 => println!("in {:.2?}", end_time),
+            _ => println!("{}", exit_code),
+        }
+
+        Ok(exit_code)
+    }
+
+    /// Returns a tuple of associated `Script` and its name.
+    fn get(&self, alias_or_name: &'a str) -> Result<(&'a str, &'a Script), DatabaseError<'a>> {
+        let chars: Vec<char> = alias_or_name.chars().collect();
+
+        if chars.len() == 1 {
+            let alias = chars[0];
+
+            match self.alias_map.get(&alias) {
+                Some(alias_name) => match alias_name {
+                    AliasName::Name(name) => match self.script_map.get(name) {
+                        Some(script) => Ok((name, script)),
+                        None => Err(DatabaseError::NoName(name)),
+                    },
+
+                    AliasName::Multi => Err(DatabaseError::MultiAlias(alias)),
+                },
+
+                None => Err(DatabaseError::NoAlias(alias)),
+            }
+        } else {
+            let name = alias_or_name;
+
+            match self.script_map.get(name) {
+                Some(script) => Ok((name, script)),
+                None => Err(DatabaseError::NoName(name)),
+            }
+        }
+    }
+
+    /// Adds a new script and its name to `self.script_map`.
+    ///
+    /// Also creates an alias for the name, if possible.
     pub(super) fn add(&mut self, name: &'a str, script: Script<'a>) -> Result<(), FormatError> {
         let alias = match name.chars().nth(0) {
             Some(ch) => ch,
             None => return Err(FormatError::NoName),
         };
 
-        if script.command.is_empty() {
+        if script.command().is_empty() {
             return Err(FormatError::NoCommand);
         }
 
@@ -57,10 +151,10 @@ impl<'a> Database<'a> {
                 // Try to get the value of given key.
                 match self.alias_map.get(&alias) {
                     // If there is an `AliasName::None`, do nothing.
-                    Some(AliasName::None) => (),
+                    Some(AliasName::Multi) => (),
                     // If there is an `AliasName::Name(_)`, insert `AliasName::None`.
                     Some(AliasName::Name(_)) => {
-                        self.alias_map.insert(alias, AliasName::None);
+                        self.alias_map.insert(alias, AliasName::Multi);
                     }
                     // If the same key is never user, insert `AliasName::Name(name)`.
                     None => {
