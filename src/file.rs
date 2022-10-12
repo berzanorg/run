@@ -35,7 +35,7 @@ pub fn read(file_name: FileName) -> Result<String> {
     match std::fs::read_to_string(file_name) {
         Ok(content) => Ok(content),
         Err(err) => Err(match err.kind() {
-            std::io::ErrorKind::NotFound => FileError::CannotBeWritten(file_name),
+            std::io::ErrorKind::NotFound => FileError::NotFound(file_name),
             _ => FileError::CannotBeRead(file_name),
         }),
     }
