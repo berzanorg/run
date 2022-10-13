@@ -1,5 +1,5 @@
 mod db;
-mod parse;
 mod errors;
+mod parse;
 
 pub use db::Database;
