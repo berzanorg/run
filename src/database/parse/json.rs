@@ -4,6 +4,7 @@ use crate::{
 };
 
 impl<'a> Database<'a> {
+    /// Creates a database by searching for the script names and commands inside `script_identifier` object in `json_string`.
     pub(super) fn from_json_object(
         json_string: &'a str,
         script_identifier: &'static str,
