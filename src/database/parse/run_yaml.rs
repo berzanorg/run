@@ -68,8 +68,7 @@ impl<'a> Database<'a> {
         // If current run.yaml content is bad, format it and save.
         db.save_if_bad(run_yaml);
 
-        println!("{}", db.extract());
-
+        // Successfully return the database.
         Ok(db)
     }
 }
