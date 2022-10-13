@@ -1,6 +1,6 @@
 use crate::database::{db::Database, errors::ParseError};
 
-const PACKAGE_JSON: &'static str = "package.json";
+pub const PACKAGE_JSON: &'static str = "package.json";
 
 impl<'a> Database<'a> {
     /// Creates a database by searching for script names and commands inside `"scripts"` object inside `package_json`. 

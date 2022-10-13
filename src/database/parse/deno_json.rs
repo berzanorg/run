@@ -1,6 +1,6 @@
 use crate::database::{db::Database, errors::ParseError};
 
-const DENO_JSON: &'static str = "deno.json";
+pub const DENO_JSON: &'static str = "deno.json";
 
 impl<'a> Database<'a> {
     /// Creates a database by searching for script names and commands inside `"tasks"` object inside `deno_json`. 

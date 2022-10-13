@@ -3,7 +3,7 @@ use crate::{
     script::Script,
 };
 
-const RUN_YAML: &'static str = "run.yaml";
+pub const RUN_YAML: &'static str = "run.yaml";
 
 impl<'a> Database<'a> {
     pub fn from_run_yaml(run_yaml: &'a str) -> Result<Database<'a>, ParseError> {

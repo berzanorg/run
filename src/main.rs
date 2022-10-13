@@ -1,6 +1,6 @@
 use std::env::args_os;
 
-use database::Database;
+use database::{Database, DENO_JSON, PACKAGE_JSON, RUN_YAML};
 
 use crate::exit::Exit;
 
@@ -21,14 +21,14 @@ fn main() {
         // If initialization flag is set, initialize a new run.yaml file.
         Some("-i" | "--init") => {
             // If package.json file exists in current directory, generate a script database using package.json scripts.
-            if file::exists("package.json") {
-                let package_json = file::read("package.json").exit();
+            if file::exists(PACKAGE_JSON) {
+                let package_json = file::read(PACKAGE_JSON).exit();
                 let db = Database::from_package_json(&package_json).exit();
                 db.save().exit();
             }
             // If deno.json file exists in current directory, generate a script database using deno.json tasks.
-            else if file::exists("deno.json") {
-                let deno_json = file::read("deno.json").exit();
+            else if file::exists(DENO_JSON) {
+                let deno_json = file::read(DENO_JSON).exit();
                 let db = Database::from_deno_json(&deno_json).exit();
                 db.save().exit();
             }
@@ -46,16 +46,17 @@ fn main() {
 
         // If an alias or name is given, run the script associated with it.
         Some(alias_or_name) => {
-            let run_yaml = file::read("run.yaml").exit();
+            let run_yaml = file::read(RUN_YAML).exit();
             let db = Database::from_run_yaml(&run_yaml).exit();
 
             let exit_code = db.run(alias_or_name).exit();
+
             std::process::exit(exit_code);
         }
 
         // If no arg is given, print all the available scripts.
         None => {
-            let run_yaml = file::read("run.yaml").exit();
+            let run_yaml = file::read(RUN_YAML).exit();
             let database = Database::from_run_yaml(&run_yaml).exit();
 
             database.print();
