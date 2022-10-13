@@ -28,8 +28,8 @@ fn main() {
             }
             // If deno.json file exists in current directory, generate a script database using deno.json tasks.
             else if file::exists("deno.json") {
-                let package_json = file::read("deno.json").exit();
-                let db = Database::from_deno_json(&package_json).exit();
+                let deno_json = file::read("deno.json").exit();
+                let db = Database::from_deno_json(&deno_json).exit();
                 db.save().exit();
             }
             // If no file above exists in current directory, generate a script database using example.
@@ -49,7 +49,8 @@ fn main() {
             let run_yaml = file::read("run.yaml").exit();
             let db = Database::from_run_yaml(&run_yaml).exit();
 
-            std::process::exit(db.run(alias_or_name).exit());
+            let exit_code = db.run(alias_or_name).exit();
+            std::process::exit(exit_code);
         }
 
         // If no arg is given, print all the available scripts.
