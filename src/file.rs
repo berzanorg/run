@@ -21,25 +21,20 @@ impl ToString for FileError {
     fn to_string(&self) -> String {
         match self {
             Self::CannotBeRead(file_name) => {
-                format!("{} {}", "can't read".red().bold(), file_name.green().bold())
+                format!("{} {}", "can't read".red(), file_name.green())
             }
+
             Self::CannotBeWritten(file_name) => {
-                format!(
-                    "{} {}",
-                    "can't write to".red().bold(),
-                    file_name.green().bold()
-                )
+                format!("{} {}", "can't write to".red(), file_name.green())
             }
-            Self::Exists(file_name) => format!(
-                "{} {}",
-                file_name.green().bold(),
-                "already exists".red().bold(),
-            ),
+
+            Self::Exists(file_name) => format!("{} {}", file_name.green(), "already exists".red(),),
+
             Self::NotFound(file_name) => format!(
                 "{} {}\n\n{}",
-                file_name.green().bold(),
-                "isn't found".red().bold(),
-                "type `run -i` to generate one".yellow().bold()
+                file_name.green(),
+                "isn't found".red(),
+                "type `run -i` to generate one".yellow()
             ),
         }
     }

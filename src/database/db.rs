@@ -40,14 +40,10 @@ impl<'a> Database<'a> {
 
     /// Prints all the available scripts' names and comments.
     pub fn print(&self) {
-        let mut content = "Run:\n".green().bold().to_string();
+        let mut content = "Run:\n".green().to_string();
 
         for (name, script) in &self.script_map {
-            content += &format!(
-                "    {}  {}\n",
-                name.yellow().bold(),
-                script.comment().green().bold()
-            )
+            content += &format!("    {}  {}\n", name.yellow(), script.comment().green())
         }
 
         println!("{}", content);
@@ -98,7 +94,7 @@ impl<'a> Database<'a> {
     pub fn run(&self, alias_or_name: &'a str) -> Result<i32, DatabaseError> {
         let (name, script) = self.get(alias_or_name)?;
 
-        println!("{} {}\n", "run".green().bold(), name.yellow().bold());
+        println!("{} {}\n", "run".green(), name.yellow());
 
         let start_time = Instant::now();
 
@@ -113,11 +109,11 @@ impl<'a> Database<'a> {
         match exit_code {
             0 => println!(
                 "\n{} {}",
-                "in".green().bold(),
-                format!("{:.2?}", end_time).yellow().bold()
+                "in".green(),
+                format!("{:.2?}", end_time).yellow()
             ),
 
-            2 => println!("\n{}", "permission denied".red().bold()),
+            2 => println!("\n{}", "permission denied".red()),
 
             126 => println!(
                 "\n{} {}",
@@ -127,9 +123,8 @@ impl<'a> Database<'a> {
                     .unwrap_or((script.command(), ""))
                     .0
                     .yellow()
-                    .yellow()
-                    .bold(),
-                "can't be executed".red().bold()
+                    .yellow(),
+                "can't be executed".red()
             ),
 
             127 => println!(
@@ -140,16 +135,11 @@ impl<'a> Database<'a> {
                     .unwrap_or((script.command(), ""))
                     .0
                     .yellow()
-                    .yellow()
-                    .bold(),
-                "is not found".red().bold()
+                    .yellow(),
+                "is not found".red()
             ),
 
-            _ => println!(
-                "\n{} {}",
-                "error code".red().bold(),
-                exit_code.green().bold()
-            ),
+            _ => println!("\n{} {}", "error code".red(), exit_code.green()),
         }
 
         Ok(exit_code)

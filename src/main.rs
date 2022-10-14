@@ -51,13 +51,9 @@ fn main() {
 
             println!(
                 "{} {}\n\n{}",
-                "run.yaml".green().bold(),
-                "is generated".yellow().bold(),
-                format!(
-                    "{} {}",
-                    "in".green().bold(),
-                    format!("{:.2?}", end_time).yellow().bold()
-                )
+                "run.yaml".green(),
+                "is generated".yellow(),
+                format!("{} {}", "in".green(), format!("{:.2?}", end_time).yellow())
             );
         }
 
@@ -65,15 +61,15 @@ fn main() {
         Some("-h" | "--help") => {
             println!(
                 "{}\n{}\n\n{}\n    {}\n\n{}\n    {}  {}\n    {} {}",
-                "Run 0.1.0".yellow().bold(),
-                "A tool to manage end execute your scripts.".green().bold(),
-                "Usage:".green().bold(),
-                "run <SCRIPT NAME>".yellow().bold(),
-                "Flags:".green().bold(),
-                "--help, -h".yellow().bold(),
-                "Displays a help message.".green().bold(),
-                "--init, -i".yellow().bold(),
-                "Creates a run.yaml file.".green().bold(),
+                "Run 0.1.0".yellow(),
+                "A tool to manage end execute your scripts.".green(),
+                "Usage:".green(),
+                "run <SCRIPT NAME>".yellow(),
+                "Flags:".green(),
+                "--help, -h".yellow(),
+                "Displays a help message.".green(),
+                "--init, -i".yellow(),
+                "Creates a run.yaml file.".green(),
             );
         }
 

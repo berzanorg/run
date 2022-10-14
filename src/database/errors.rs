@@ -63,72 +63,72 @@ impl ToString for ParseError {
             Self::MinusInStartOfName(line_no, file_name) => {
                 format!(
                     "{}{}{} {} {} {}",
-                    "name begins with '".red().bold(),
-                    "-".green().bold(),
-                    "' at line".red().bold(),
-                    line_no.green().bold(),
-                    "in".red().bold(),
-                    file_name.green().bold()
+                    "name begins with '".red(),
+                    "-".green(),
+                    "' at line".red(),
+                    line_no.green(),
+                    "in".red(),
+                    file_name.green()
                 )
             }
 
             Self::NoColon(line_no) => {
                 format!(
                     "{} {} {} {}",
-                    "split name and script at line".red().bold(),
-                    line_no.green().bold(),
-                    "in".red().bold(),
-                    "run.yaml".green().bold()
+                    "split name and script at line".red(),
+                    line_no.green(),
+                    "in".red(),
+                    "run.yaml".green()
                 )
             }
             Self::NoCommand(line_no, file_name) => {
                 format!(
                     "{} {} {} {}",
-                    "script is empty at line".red().bold(),
-                    line_no.green().bold(),
-                    "in".red().bold(),
-                    file_name.green().bold()
+                    "script is empty at line".red(),
+                    line_no.green(),
+                    "in".red(),
+                    file_name.green()
                 )
             }
 
             Self::NoName(line_no, file_name) => {
                 format!(
                     "{} {} {} {}",
-                    "name is empty at line".red().bold(),
-                    line_no.green().bold(),
-                    "in".red().bold(),
-                    file_name.green().bold()
+                    "name is empty at line".red(),
+                    line_no.green(),
+                    "in".red(),
+                    file_name.green()
                 )
             }
 
             Self::SpaceInName(line_no, file_name) => {
                 format!(
                     "{}{}{} {} {} {}",
-                    "name contains '".red().bold(),
-                    " ".green().bold(),
-                    "' at line".red().bold(),
-                    line_no.green().bold(),
-                    "in".red().bold(),
-                    file_name.green().bold()
+                    "name contains '".red(),
+                    " ".green(),
+                    "' at line".red(),
+                    line_no.green(),
+                    "in".red(),
+                    file_name.green()
                 )
             }
 
             Self::UnexpectedComment(line_no) => {
                 format!(
                     "{} {} {} {}",
-                    "unexpected comment at line".red().bold(),
-                    line_no.green().bold(),
-                    "in".red().bold(),
-                    "run.yaml".green().bold()
+                    "unexpected comment at line".red(),
+                    line_no.green(),
+                    "in".red(),
+                    "run.yaml".green()
                 )
             }
             Self::UsedName(line_no, file_name) => {
                 format!(
                     "{} {} {} {}",
-                    "same name is already used at line".red().bold(),
-                    line_no.green().bold(),
-                    "in".red().bold(),
-                    file_name.green().bold()
+                    "same name is already used at line".red(),
+                    line_no.green(),
+                    "in".red(),
+                    file_name.green()
                 )
             }
         }
