@@ -59,7 +59,15 @@ impl<'a> Database<'a> {
                             }
                         }
                         // If the splition is failed, return an error.
-                        None => return Err(ParseError::NoColon(line_index + 1)),
+                        None => {
+                            return {
+                                if line.ends_with(":") {
+                                    Err(ParseError::NoCommand(line_index + 1, RUN_YAML))
+                                } else {
+                                    Err(ParseError::NoColon(line_index + 1))
+                                }
+                            }
+                        }
                     }
                 }
             }
