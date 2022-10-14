@@ -28,7 +28,7 @@ impl<'a> Database<'a> {
                     }
                     // There is an unexpected comment.
                     else {
-                        return Err(ParseError::UnexpectedComment(line_index + 1, RUN_YAML));
+                        return Err(ParseError::UnexpectedComment(line_index + 1));
                     }
                 }
                 // If a line isn't a comment, it must hold a script name and script command.
@@ -59,7 +59,7 @@ impl<'a> Database<'a> {
                             }
                         }
                         // If the splition is failed, return an error.
-                        None => return Err(ParseError::NoColon(line_index + 1, RUN_YAML)),
+                        None => return Err(ParseError::NoColon(line_index + 1)),
                     }
                 }
             }

@@ -1,5 +1,8 @@
 use crate::{
-    database::{errors::ParseError, Database},
+    database::{
+        errors::{FormatError, ParseError},
+        Database,
+    },
     script::Script,
 };
 
@@ -108,7 +111,9 @@ impl<'a> Database<'a> {
                     // If there is a script command, remove its leading and trailing spaces.
                     Some((command, _)) => command.trim(),
                     // If there isn't a script command, return an error.
-                    None => return Err(ParseError::NoCommand(name_line_no, file_name)),
+                    None => {
+                        return Err(FormatError::NoCommand.into_parse_error(name_line_no, file_name))
+                    }
                 };
 
                 // Try to add the script name and script to the database.
