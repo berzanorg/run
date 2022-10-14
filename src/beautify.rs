@@ -13,7 +13,7 @@ where
     T: 'a + Display,
 {
     content: &'a T,
-    color: Option<u8>,
+    color: u8,
 }
 
 // Implement `Display` trait for `Beautiful`.
@@ -22,11 +22,7 @@ where
     T: 'a + Display,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.color {
-            Some(color) => write!(f, "\x1B[1;{}m{}\x1B[0m", color, self.content),
-
-            None => self.content.fmt(f),
-        }
+        write!(f, "\x1B[1;{}m{}\x1B[0m", self.color, self.content)
     }
 }
 
@@ -49,7 +45,7 @@ where
     fn green(&self) -> Beautiful<T> {
         Beautiful {
             content: &self,
-            color: Some(colors::GREEN),
+            color: colors::GREEN,
         }
     }
 
@@ -57,7 +53,7 @@ where
     fn red(&self) -> Beautiful<T> {
         Beautiful {
             content: &self,
-            color: Some(colors::RED),
+            color: colors::RED,
         }
     }
 
@@ -65,7 +61,7 @@ where
     fn yellow(&self) -> Beautiful<T> {
         Beautiful {
             content: &self,
-            color: Some(colors::YELLOW),
+            color: colors::YELLOW,
         }
     }
 }
