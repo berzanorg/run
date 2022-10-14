@@ -1,3 +1,5 @@
+use crate::beautify::Beautify;
+
 /// The error type for database operations.
 pub enum DatabaseError<'a> {
     NoAlias(char),
@@ -60,35 +62,75 @@ impl ToString for ParseError {
         match self {
             Self::MinusInStartOfName(line_no, file_name) => {
                 format!(
-                    "LINE {}: a name cannot start with a minus symbol in {}",
-                    line_no, file_name
+                    "{}{}{} {} {} {}",
+                    "name begins with '".red().bold(),
+                    "-".green().bold(),
+                    "' at line".red().bold(),
+                    line_no.green().bold(),
+                    "in".red().bold(),
+                    file_name.green().bold()
                 )
             }
+
             Self::NoColon(line_no) => {
                 format!(
-                    "LINE {}: seperate name and script with a colon in {}",
-                    line_no, "run.yaml"
+                    "{} {} {} {}",
+                    "split name and script at line".red().bold(),
+                    line_no.green().bold(),
+                    "in".red().bold(),
+                    "run.yaml".green().bold()
                 )
             }
             Self::NoCommand(line_no, file_name) => {
-                format!("LINE {}: script is empty in {}", line_no, file_name)
-            }
-            Self::NoName(line_no, file_name) => {
-                format!("LINE {}: name is empty in {}", line_no, file_name)
-            }
-            Self::SpaceInName(line_no, file_name) => {
                 format!(
-                    "LINE {}: a name cannot contain a space symbol in {}",
-                    line_no, file_name
+                    "{} {} {} {}",
+                    "script is empty at line".red().bold(),
+                    line_no.green().bold(),
+                    "in".red().bold(),
+                    file_name.green().bold()
                 )
             }
-            Self::UnexpectedComment(line_no) => {
-                format!("LINE {}: unexpected comment in {}", line_no, "run.yaml")
+
+            Self::NoName(line_no, file_name) => {
+                format!(
+                    "{} {} {} {}",
+                    "name is empty at line".red().bold(),
+                    line_no.green().bold(),
+                    "in".red().bold(),
+                    file_name.green().bold()
+                )
             }
-            Self::UsedName(line_no, file_name) => format!(
-                "LINE {}: same name is used before in {}",
-                line_no, file_name
-            ),
+
+            Self::SpaceInName(line_no, file_name) => {
+                format!(
+                    "{}{}{} {} {} {}",
+                    "name contains '".red().bold(),
+                    " ".green().bold(),
+                    "' at line".red().bold(),
+                    line_no.green().bold(),
+                    "in".red().bold(),
+                    file_name.green().bold()
+                )
+            }
+
+            Self::UnexpectedComment(line_no) => {
+                format!(
+                    "{} {} {} {}",
+                    "unexpected comment at line".red().bold(),
+                    line_no.green().bold(),
+                    "in".red().bold(),
+                    "run.yaml".green().bold()
+                )
+            }
+            Self::UsedName(line_no, file_name) => {
+                format!(
+                    "{} {} {} {}",
+                    "same name is already used at line".red().bold(),
+                    line_no.green().bold(),
+                    "in".red().bold(),
+                    file_name.green().bold()
+                )
+            }
         }
     }
 }
