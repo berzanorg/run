@@ -4,6 +4,7 @@ use std::{
 };
 
 use crate::{
+    beautify::Beautify,
     file::{self, FileError},
     script::Script,
 };
@@ -39,10 +40,14 @@ impl<'a> Database<'a> {
 
     /// Prints all the available scripts' names and comments.
     pub fn print(&self) {
-        let mut content = "Scripts:\n".to_string();
+        let mut content = "Run:\n".green().bold().to_string();
 
         for (name, script) in &self.script_map {
-            content = content + "    " + name + "   " + script.comment() + "\n\n";
+            content += &format!(
+                "    {}  {}\n",
+                name.yellow().bold(),
+                script.comment().green().bold()
+            )
         }
 
         println!("{}", content);
@@ -93,7 +98,7 @@ impl<'a> Database<'a> {
     pub fn run(&self, alias_or_name: &'a str) -> Result<i32, DatabaseError> {
         let (name, script) = self.get(alias_or_name)?;
 
-        println!("run {}", name);
+        println!("{} {}\n", "run".green().bold(), name.yellow().bold());
 
         let start_time = Instant::now();
 
@@ -106,8 +111,45 @@ impl<'a> Database<'a> {
         let end_time = start_time.elapsed();
 
         match exit_code {
-            0 => println!("in {:.2?}", end_time),
-            _ => println!("{}", exit_code),
+            0 => println!(
+                "\n{} {}",
+                "in".green().bold(),
+                format!("{:.2?}", end_time).yellow().bold()
+            ),
+
+            2 => println!("\n{}", "permission denied".red().bold()),
+
+            126 => println!(
+                "\n{} {}",
+                script
+                    .command()
+                    .split_once(" ")
+                    .unwrap_or((script.command(), ""))
+                    .0
+                    .yellow()
+                    .yellow()
+                    .bold(),
+                "can't be executed".red().bold()
+            ),
+
+            127 => println!(
+                "\n{} {}",
+                script
+                    .command()
+                    .split_once(" ")
+                    .unwrap_or((script.command(), ""))
+                    .0
+                    .yellow()
+                    .yellow()
+                    .bold(),
+                "is not found".red().bold()
+            ),
+
+            _ => println!(
+                "\n{} {}",
+                "error code".red().bold(),
+                exit_code.green().bold()
+            ),
         }
 
         Ok(exit_code)
