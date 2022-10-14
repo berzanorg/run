@@ -1,4 +1,4 @@
-use std::env::args_os;
+use std::{env::args_os, time::Instant};
 
 use database::{Database, DENO_JSON, PACKAGE_JSON, RUN_YAML};
 
@@ -23,6 +23,8 @@ fn main() {
     match param {
         // If initialization flag is set, initialize a new run.yaml file.
         Some("-i" | "--init") => {
+            let start_time = Instant::now();
+
             // If package.json file exists in current directory, generate a script database using package.json scripts.
             if file::exists(PACKAGE_JSON) {
                 let package_json = file::read(PACKAGE_JSON).exit();
@@ -44,11 +46,35 @@ fn main() {
 
                 db.save().exit();
             }
+
+            let end_time = start_time.elapsed();
+
+            println!(
+                "{} {}\n\n{}",
+                "run.yaml".green().bold(),
+                "is generated".yellow().bold(),
+                format!(
+                    "{} {}",
+                    "in".green().bold(),
+                    format!("{:.2?}", end_time).yellow().bold()
+                )
+            );
         }
 
         // If help flag is set, print a help message.
         Some("-h" | "--help") => {
-            println!("Run is a tool to manage and execute your scripts.");
+            println!(
+                "{}\n{}\n\n{}\n    {}\n\n{}\n    {}  {}\n    {} {}",
+                "Run 0.1.0".yellow().bold(),
+                "A tool to manage end execute your scripts.".green().bold(),
+                "Usage:".green().bold(),
+                "run <SCRIPT NAME>".yellow().bold(),
+                "Flags:".green().bold(),
+                "--help, -h".yellow().bold(),
+                "Displays a help message.".green().bold(),
+                "--init, -i".yellow().bold(),
+                "Creates a run.yaml file.".green().bold(),
+            );
         }
 
         // If an alias or name is given, run the script associated with it.
