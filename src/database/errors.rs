@@ -46,12 +46,12 @@ pub type FileName = &'static str;
 
 /// The error type for parsing operations.
 pub enum ParseError {
+    MinusInStartOfName(LineNumber, FileName),
     NoName(LineNumber, FileName),
     NoCommand(LineNumber, FileName),
     SpaceInName(LineNumber, FileName),
-    MinusInStartOfName(LineNumber, FileName),
-    NoColon(LineNumber, FileName),
-    UnexpectedComment(LineNumber, FileName),
+    NoColon(LineNumber),
+    UnexpectedComment(LineNumber),
     UsedName(LineNumber, FileName),
 }
 
@@ -64,10 +64,10 @@ impl ToString for ParseError {
                     line_no, file_name
                 )
             }
-            Self::NoColon(line_no, file_name) => {
+            Self::NoColon(line_no) => {
                 format!(
                     "LINE {}: seperate name and script with a colon in {}",
-                    line_no, file_name
+                    line_no, "run.yaml"
                 )
             }
             Self::NoCommand(line_no, file_name) => {
@@ -82,8 +82,8 @@ impl ToString for ParseError {
                     line_no, file_name
                 )
             }
-            Self::UnexpectedComment(line_no, file_name) => {
-                format!("LINE {}: unexpected comment in {}", line_no, file_name)
+            Self::UnexpectedComment(line_no) => {
+                format!("LINE {}: unexpected comment in {}", line_no, "run.yaml")
             }
             Self::UsedName(line_no, file_name) => format!(
                 "LINE {}: same name is used before in {}",
