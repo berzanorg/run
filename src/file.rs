@@ -1,3 +1,5 @@
+use crate::beautify::Beautify;
+
 /// The type that represents file names.
 type FileName = &'static str;
 
@@ -18,10 +20,27 @@ pub enum FileError {
 impl ToString for FileError {
     fn to_string(&self) -> String {
         match self {
-            Self::CannotBeRead(file_name) => format!("can't read {}", file_name),
-            Self::CannotBeWritten(file_name) => format!("can't write to {}", file_name),
-            Self::Exists(file_name) => format!("{} already exists", file_name),
-            Self::NotFound(file_name) => format!("{} is not found", file_name),
+            Self::CannotBeRead(file_name) => {
+                format!("{} {}", "can't read".red().bold(), file_name.green().bold())
+            }
+            Self::CannotBeWritten(file_name) => {
+                format!(
+                    "{} {}",
+                    "can't write to".red().bold(),
+                    file_name.green().bold()
+                )
+            }
+            Self::Exists(file_name) => format!(
+                "{} {}",
+                file_name.green().bold(),
+                "already exists".red().bold(),
+            ),
+            Self::NotFound(file_name) => format!(
+                "{} {}\n\n{}",
+                file_name.green().bold(),
+                "isn't found".red().bold(),
+                "type `run -i` to generate one".yellow().bold()
+            ),
         }
     }
 }
